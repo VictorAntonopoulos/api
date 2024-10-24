@@ -9,7 +9,7 @@ load_dotenv()
 
 # Configurações da API do Watson Assistant
 watson_api_key = os.getenv('WATSON_API_KEY')
-watson_url = 'https://api.us-south.assistant.watson.cloud.ibm.com/instances/9a951de9-11a2-4f6b-a6df-5920ef1e8fb3'
+watson_url = 'https://api.us-south.assistant.watson.cloud.ibm.com/v2/assistants/a95a817d-f89c-43a0-83e0-594c3998f07b/sessions'
 headers = {
     'Content-Type': 'application/json',
     'Authorization': f'Bearer {watson_api_key}',
