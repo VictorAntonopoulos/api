@@ -2,7 +2,7 @@ import streamlit as st
 import requests
 
 # Defina a URL da sua API
-API_URL = "http://localhost:5000/prever"
+API_URL = "http://127.0.0.1:5000/prever"
 
 # Título da aplicação
 st.title("Previsão de Dados do Veículo")
@@ -27,11 +27,12 @@ if st.button("Fazer Previsão"):
         "coolant_temp": coolant_temp
     }
 
-    # Envie uma requisição POST para a API
-    response = requests.post(API_URL, json=data)
+    # Envie uma requisição GET para a API com os dados como parâmetros
+    response = requests.get(API_URL, params=data)
 
+    # Verifique a resposta da API
     if response.status_code == 200:
         result = response.json()
         st.success(f"Previsão: {result['previsao']}")
     else:
-        st.error(f"Erro: {response.json()['erro']}")
+        st.error(f"Erro: {response.json().get('erro', 'Erro desconhecido')}")
