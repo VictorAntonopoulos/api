@@ -1,54 +1,37 @@
 import streamlit as st
 import requests
-import json
-import os
-from dotenv import load_dotenv
 
-# Carrega as variáveis de ambiente do arquivo .env
-load_dotenv()
+# Defina a URL da sua API
+API_URL = "http://localhost:5000/prever"
 
-# Configurações da API do Watson Assistant
-watson_api_key = os.getenv('WATSON_API_KEY')
-watson_url = 'https://api.us-south.assistant.watson.cloud.ibm.com/v2/assistants/a95a817d-f89c-43a0-83e0-594c3998f07b/sessions'
-headers = {
-    'Content-Type': 'application/json',
-    'Authorization': f'Bearer {watson_api_key}',
-}
+# Título da aplicação
+st.title("Previsão de Dados do Veículo")
 
-# Função para enviar uma mensagem ao Watson Assistant
-def send_message_to_watson(message):
+# Campos para entrada de dados
+engine_rpm = st.number_input("Engine RPM", min_value=0.0)
+lub_oil_pressure = st.number_input("Lub Oil Pressure", min_value=0.0)
+fuel_pressure = st.number_input("Fuel Pressure", min_value=0.0)
+coolant_pressure = st.number_input("Coolant Pressure", min_value=0.0)
+lub_oil_temp = st.number_input("Lub Oil Temperature", min_value=0.0)
+coolant_temp = st.number_input("Coolant Temperature", min_value=0.0)
+
+# Botão para fazer a previsão
+if st.button("Fazer Previsão"):
+    # Prepare os dados para enviar à API
     data = {
-        'input': {
-            'text': message
-        }
+        "engine_rpm": engine_rpm,
+        "lub_oil_pressure": lub_oil_pressure,
+        "fuel_pressure": fuel_pressure,
+        "coolant_pressure": coolant_pressure,
+        "lub_oil_temp": lub_oil_temp,
+        "coolant_temp": coolant_temp
     }
-    response = requests.post(watson_url, headers=headers, data=json.dumps(data))
 
-    # Verifica se a resposta está no formato esperado
+    # Envie uma requisição POST para a API
+    response = requests.post(API_URL, json=data)
+
     if response.status_code == 200:
-        return response.json()
+        result = response.json()
+        st.success(f"Previsão: {result['previsao']}")
     else:
-        st.error("Erro ao se comunicar com o assistente. Verifique a chave da API e a URL.")
-        return {}
-
-# Interface do Streamlit
-st.set_page_config(page_title="Chatbot Galdí", layout="wide")
-st.title("🌟 Chatbot Galdí 🌟")
-st.markdown("Olá! Eu sou Galdí, seu assistente virtual. Como posso ajudar você hoje?")
-
-# Campo de texto para interação com o Watson Assistant
-user_message = st.text_input("Digite sua mensagem para Galdí:", placeholder="Escreva aqui...")
-
-if st.button("Enviar"):
-    if user_message:
-        with st.spinner("Galdí está pensando..."):
-            watson_response = send_message_to_watson(user_message)
-
-            # Verifica se a resposta contém o texto esperado
-            if 'output' in watson_response and 'generic' in watson_response['output']:
-                response_text = watson_response['output']['generic'][0].get('text', 'Desculpe, não consegui entender a resposta.')
-                st.success(f"Galdí: {response_text}")
-            else:
-                st.error("Desculpe, não consegui processar a resposta do assistente.")
-    else:
-        st.warning("Por favor, digite uma mensagem antes de enviar.")
+        st.error(f"Erro: {response.json()['erro']}")
