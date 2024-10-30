@@ -2,7 +2,9 @@ import streamlit as st
 import requests
 
 # Defina a URL da sua API
-API_URL = "http://localhost:5000/prever"
+API_URL = "http://127.0.0.1:5000/prever"
+
+
 
 # Título da aplicação
 st.title("Previsão de Dados do Veículo")
